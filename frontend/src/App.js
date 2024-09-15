@@ -55,7 +55,7 @@ function App() {
   return (
     <Container maxWidth="sm">
       <Box sx={{ mt: 8, display: 'flex', justifyContent: 'center' }}>
-        <Card sx={{ width: '100%', maxWidth: 400, boxShadow: 3 }}>
+        <Card sx={{ width: '100%', maxWidth: 800, boxShadow: 3 }}>
           <CardContent>
             <Typography variant="h4" align="center" gutterBottom>
               Welcome to WelcomeAboard
