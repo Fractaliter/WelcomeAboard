@@ -1,0 +1,124 @@
+{
+  "api": {
+    "WelcomeAboard": {
+      "dependsOn": [],
+      "output": {
+        "authConfig": {
+          "additionalAuthenticationProviders": [
+            {
+              "authenticationType": "AWS_IAM"
+            }
+          ],
+          "defaultAuthentication": {
+            "apiKeyConfig": {
+              "apiKeyExpirationDays": 30,
+              "description": "api key description"
+            },
+            "authenticationType": "API_KEY"
+          }
+        }
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "AppSync"
+    }
+  },
+  "auth": {
+    "welcomeaboard": {
+      "customAuth": false,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "serviceType": "imported"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_auth_welcomeaboard_allowUnauthenticatedIdentities": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "welcomeaboard"
+        }
+      ]
+    },
+    "AMPLIFY_auth_welcomeaboard_authRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "welcomeaboard"
+        }
+      ]
+    },
+    "AMPLIFY_auth_welcomeaboard_authRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "welcomeaboard"
+        }
+      ]
+    },
+    "AMPLIFY_auth_welcomeaboard_identityPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "welcomeaboard"
+        }
+      ]
+    },
+    "AMPLIFY_auth_welcomeaboard_identityPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "welcomeaboard"
+        }
+      ]
+    },
+    "AMPLIFY_auth_welcomeaboard_nativeClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "welcomeaboard"
+        }
+      ]
+    },
+    "AMPLIFY_auth_welcomeaboard_unauthRoleArn": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "welcomeaboard"
+        }
+      ]
+    },
+    "AMPLIFY_auth_welcomeaboard_unauthRoleName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "welcomeaboard"
+        }
+      ]
+    },
+    "AMPLIFY_auth_welcomeaboard_userPoolId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "welcomeaboard"
+        }
+      ]
+    },
+    "AMPLIFY_auth_welcomeaboard_userPoolName": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "welcomeaboard"
+        }
+      ]
+    },
+    "AMPLIFY_auth_welcomeaboard_webClientId": {
+      "usedBy": [
+        {
+          "category": "auth",
+          "resourceName": "welcomeaboard"
+        }
+      ]
+    }
+  }
+}

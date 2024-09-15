@@ -1,140 +1,155 @@
 import React, { useState, useEffect } from 'react';
+import { DataStore } from '@aws-amplify/datastore';  // Correct import
+import { Company } from './models'; // Ensure path is correct for your models
 import { TextField, Button, Box, Typography } from '@mui/material';
-import axios from 'axios';
 
 const AdminComponent = () => {
-  // State for managing companies
-  const [companies, setCompanies] = useState([]);
-  const [companyID, setCompanyID] = useState('');
+  const [companyID, setCompanyID] = useState(''); // Assuming `companyID` is replaced, or adjust if it's been renamed
   const [companyName, setCompanyName] = useState('');
   const [companyLocation, setCompanyLocation] = useState('');
   const [companyIndustry, setCompanyIndustry] = useState('');
   const [companyFoundedYear, setCompanyFoundedYear] = useState('');
+  const [companies, setCompanies] = useState([]);
 
-  // Fetch all companies (GET request)
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
+
   const fetchCompanies = async () => {
     try {
-      const response = await axios.get('/company/all');
-      setCompanies(response.data);
+      const companyData = await DataStore.query(Company);
+      setCompanies(companyData);
     } catch (error) {
       console.error('Error fetching companies:', error);
     }
   };
 
-  // Create a new company (POST request)
-  const createCompany = async () => {
+  const createCompany = async (e) => {
+    e.preventDefault();
     try {
-      const newCompany = {
-        companyID: parseInt(companyID),  // Convert to number here
-        name: companyName,
-        location: companyLocation,
-        industry: companyIndustry,
-        foundedYear: companyFoundedYear
-      };
-      await axios.post('/company', newCompany);
-      fetchCompanies(); // Refresh the company list
+      await DataStore.save(
+        new Company({
+          name: companyName,
+          location: companyLocation,
+          industry: companyIndustry,
+          foundedYear: companyFoundedYear,
+        })
+      );
+      fetchCompanies();
+      clearForm();
     } catch (error) {
-      console.error('Error creating company:', error);
+      console.error('Error creating/updating company:', error);
     }
   };
 
-  // Update an existing company (PUT request)
-  const updateCompany = async (id) => {
+  const updateCompany = async (companyName) => {
     try {
-      const updatedCompany = {
-        name: companyName,
-        location: companyLocation,
-        industry: companyIndustry,
-        foundedYear: companyFoundedYear
-      };
-      await axios.put(`/company/${id}`, updatedCompany);
-      fetchCompanies(); // Refresh the company list
+      const original = await DataStore.query(Company, companyName);
+      if (original) {
+        await DataStore.save(
+          Company.copyOf(original, updated => {
+            updated.name = companyName;
+            updated.location = companyLocation;
+            updated.industry = companyIndustry;
+            updated.foundedYear = companyFoundedYear;
+          })
+        );
+        fetchCompanies();
+        clearForm();
+      }
     } catch (error) {
       console.error('Error updating company:', error);
     }
   };
 
-  // Delete a company (DELETE request)
-  const deleteCompany = async (id) => {
+  const deleteCompany = async (companyName) => {
     try {
-      await axios.delete(`/company/${id}`);
-      fetchCompanies(); // Refresh the company list
+      const companyToDelete = await DataStore.query(Company, companyName);
+      await DataStore.delete(companyToDelete);
+      fetchCompanies();
     } catch (error) {
       console.error('Error deleting company:', error);
     }
   };
 
-  // Fetch companies on component mount
-  useEffect(() => {
-    fetchCompanies();
-  }, []);
+  const clearForm = () => {
+    setCompanyID('');
+    setCompanyName('');
+    setCompanyLocation('');
+    setCompanyIndustry('');
+    setCompanyFoundedYear('');
+  };
 
   return (
-    <div>
-      <h1>Admin Panel - Manage Companies</h1>
-
-      <Box component="form" onSubmit={(e) => { e.preventDefault(); createCompany(); }} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography variant="h6">Create/Update Company</Typography>
-
-        <TextField
-          label="Company ID"
-          variant="outlined"
-          value={companyID}
-          onChange={(e) => setCompanyID(e.target.value)}
-          required
-          fullWidth
-        />
-
+    <Box sx={{ padding: '20px' }}>
+      <Typography variant="h4">Admin Panel - Manage Companies</Typography>
+      <Box component="form" onSubmit={createCompany} sx={{ mt: 2 }}>
         <TextField
           label="Company Name"
-          variant="outlined"
+          type="text"
           value={companyName}
           onChange={(e) => setCompanyName(e.target.value)}
           required
           fullWidth
+          sx={{ mb: 2 }}
         />
-
         <TextField
           label="Location"
-          variant="outlined"
+          type="text"
           value={companyLocation}
           onChange={(e) => setCompanyLocation(e.target.value)}
           fullWidth
+          sx={{ mb: 2 }}
         />
-
         <TextField
           label="Industry"
-          variant="outlined"
+          type="text"
           value={companyIndustry}
           onChange={(e) => setCompanyIndustry(e.target.value)}
           fullWidth
+          sx={{ mb: 2 }}
         />
-
         <TextField
           label="Founded Year"
-          variant="outlined"
+          type="text"
           value={companyFoundedYear}
           onChange={(e) => setCompanyFoundedYear(e.target.value)}
           fullWidth
+          sx={{ mb: 2 }}
         />
-
-        <Button variant="contained" color="primary" type="submit">
+        <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
           Create/Update Company
         </Button>
       </Box>
 
-      {/* List of companies */}
-      <h2>Company List</h2>
-      <ul>
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h5">Existing Companies</Typography>
         {companies.map((company) => (
-          <li key={company.companyID}>
-            {company.name} - {company.location} - {company.industry} - Founded: {company.foundedYear}
-            <button onClick={() => updateCompany(company.companyID)}>Update</button>
-            <button onClick={() => deleteCompany(company.companyID)}>Delete</button>
-          </li>
+          <Box key={company.id} sx={{ mt: 2, border: '1px solid #ccc', padding: '10px' }}>
+            <Typography variant="h6">{company.name}</Typography>
+            <Typography>Location: {company.location}</Typography>
+            <Typography>Industry: {company.industry}</Typography>
+            <Typography>Founded Year: {company.foundedYear}</Typography>
+            <Button
+              onClick={() => updateCompany(company.id)}
+              variant="contained"
+              color="secondary"
+              sx={{ mr: 2, mt: 2 }}
+            >
+              Update
+            </Button>
+            <Button
+              onClick={() => deleteCompany(company.id)}
+              variant="outlined"
+              color="error"
+              sx={{ mt: 2 }}
+            >
+              Delete
+            </Button>
+          </Box>
         ))}
-      </ul>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

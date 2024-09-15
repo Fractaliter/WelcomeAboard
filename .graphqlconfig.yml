@@ -1,0 +1,18 @@
+projects:
+  WelcomeAboard:
+    schemaPath: amplify/backend/api/WelcomeAboard/build/schema.graphql
+    includes:
+      - frontend/src/graphql/**/*.js
+    excludes:
+      - ./amplify/**
+    extensions:
+      amplify:
+        codeGenTarget: javascript
+        generatedFileName: ''
+        docsFilePath: frontend/src/graphql
+        region: eu-central-1
+        apiId: null
+        maxDepth: 2
+extensions:
+  amplify:
+    version: 3

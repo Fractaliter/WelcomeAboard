@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@aws-amplify/auth": "^6.4.0",
-    "@aws-amplify/ui-react": "^6.3.0",
+    "@aws-amplify/ui-react": "^6.3.1",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/material": "^6.0.2",

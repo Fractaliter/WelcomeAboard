@@ -1,0 +1,32 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-welcomeaboard-dev-61275-authRole",
+      "UnauthRoleArn": "arn:aws:iam::010438471799:role/amplify-welcomeaboard-dev-61275-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::010438471799:role/amplify-welcomeaboard-dev-61275-authRole",
+      "Region": "eu-central-1",
+      "DeploymentBucketName": "amplify-welcomeaboard-dev-61275-deployment",
+      "UnauthRoleName": "amplify-welcomeaboard-dev-61275-unauthRole",
+      "StackName": "amplify-welcomeaboard-dev-61275",
+      "StackId": "arn:aws:cloudformation:eu-central-1:010438471799:stack/amplify-welcomeaboard-dev-61275/d174ab40-7030-11ef-bfee-0a6fc704a023",
+      "AmplifyAppId": "d34rs8h6wz3dqp"
+    },
+    "categories": {
+      "auth": {
+        "welcomeaboard": {
+          "allowUnauthenticatedIdentities": false,
+          "authRoleArn": "arn:aws:iam::010438471799:role/service-role/WelcomeAbaordIDPRole",
+          "authRoleName": "WelcomeAbaordIDPRole",
+          "identityPoolId": "eu-central-1:68af0ad5-0e60-4fb1-8ef6-b3c23ad492d4",
+          "identityPoolName": "WelcomeAboardIDP",
+          "nativeClientId": "5omurcqns8b7jfjm67fjuuis3q",
+          "unauthRoleArn": "arn:aws:iam::010438471799:role/service-role/WelcomeAbaordIDPRole",
+          "unauthRoleName": "WelcomeAbaordIDPRole",
+          "userPoolId": "eu-central-1_o1zxRgSHF",
+          "userPoolName": "WelcomeAboardPool",
+          "webClientId": "5omurcqns8b7jfjm67fjuuis3q"
+        }
+      }
+    }
+  }
+}
