@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
 import { Authenticator, Button } from '@aws-amplify/ui-react';
-import { getCurrentUser } from 'aws-amplify/auth'; // Correct method for Amplify v6
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { Container, Typography, Box, Card, CardContent } from '@mui/material';
 import awsconfig from './aws-exports';
@@ -11,7 +10,6 @@ import UserComponent from './UserComponent';
 Amplify.configure(awsconfig);
 
 function App() {
-  const [user, setUser] = useState(null);
   const [userGroup, setUserGroup] = useState(null);  // For user group (role)
 
   useEffect(() => {
@@ -28,17 +26,18 @@ function App() {
   
       // Check if the session has tokens and idToken
       if (session && session.tokens && session.tokens.idToken) {
-        const idToken = session.tokens.idToken.jwtToken;
-        console.log('ID Token:', idToken);
-  
-        // Set the user
-        setUser(session);
-  
-        // Fetch user groups from the ID token payload
-        const userGroups = session.tokens.idToken.payload["cognito:groups"];
+        const idToken = session.tokens.idToken;
+        console.log('Full ID Token:', idToken);
+      
+        // Log payload
+        const payload = idToken.payload;
+        console.log('ID Token Payload:', payload);
+      
+        // Fetch user groups from the payload
+        const userGroups = payload["cognito:groups"];
         console.log('User Groups:', userGroups);
-  
-        // Set user group based on token information
+      
+        // Determine if user is an Admin or not
         if (userGroups && userGroups.includes('Admin')) {
           setUserGroup('Admin');
         } else {
