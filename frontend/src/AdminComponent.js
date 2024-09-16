@@ -9,6 +9,7 @@ const AdminComponent = () => {
   const [companyIndustry, setCompanyIndustry] = useState('');
   const [companyFoundedYear, setCompanyFoundedYear] = useState('');
   const [companies, setCompanies] = useState([]);
+  const [editingCompanyId, setEditingCompanyId] = useState(null); // Track which company is being edited
 
   useEffect(() => {
     fetchCompanies();
@@ -26,14 +27,20 @@ const AdminComponent = () => {
   const createCompany = async (e) => {
     e.preventDefault();
     try {
-      await DataStore.save(
-        new Company({
-          name: companyName,
-          location: companyLocation,
-          industry: companyIndustry,
-          foundedYear: companyFoundedYear,
-        })
-      );
+      if (editingCompanyId) {
+        // Update existing company
+        await updateCompany(editingCompanyId);
+      } else {
+        // Create new company
+        await DataStore.save(
+          new Company({
+            name: companyName,
+            location: companyLocation,
+            industry: companyIndustry,
+            foundedYear: companyFoundedYear,
+          })
+        );
+      }
       fetchCompanies();
       clearForm();
     } catch (error) {
@@ -41,9 +48,9 @@ const AdminComponent = () => {
     }
   };
 
-  const updateCompany = async (companyName) => {
+  const updateCompany = async (id) => {
     try {
-      const original = await DataStore.query(Company, companyName);
+      const original = await DataStore.query(Company, id);
       if (original) {
         await DataStore.save(
           Company.copyOf(original, (updated) => {
@@ -61,7 +68,6 @@ const AdminComponent = () => {
     }
   };
 
-  // Updated deleteCompany function to use the company ID
   const deleteCompany = async (id) => {
     try {
       const companyToDelete = await DataStore.query(Company, id);
@@ -79,6 +85,15 @@ const AdminComponent = () => {
     setCompanyLocation('');
     setCompanyIndustry('');
     setCompanyFoundedYear('');
+    setEditingCompanyId(null); // Reset the editing state
+  };
+
+  const handleEdit = (company) => {
+    setCompanyName(company.name);
+    setCompanyLocation(company.location);
+    setCompanyIndustry(company.industry);
+    setCompanyFoundedYear(company.foundedYear);
+    setEditingCompanyId(company.id); // Set the editing state
   };
 
   return (
@@ -119,7 +134,7 @@ const AdminComponent = () => {
           sx={{ mb: 2 }}
         />
         <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-          Create/Update Company
+          {editingCompanyId ? 'Update Company' : 'Create Company'}
         </Button>
       </Box>
 
@@ -135,7 +150,7 @@ const AdminComponent = () => {
             <Typography>Industry: {company.industry}</Typography>
             <Typography>Founded Year: {company.foundedYear}</Typography>
             <Button
-              onClick={() => updateCompany(company.name)}
+              onClick={() => handleEdit(company)}
               variant="contained"
               color="secondary"
               sx={{ mr: 2, mt: 2 }}
