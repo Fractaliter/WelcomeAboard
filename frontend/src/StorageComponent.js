@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
-import { uploadData, downloadData, list, remove } from '@aws-amplify/storage';
+import { uploadData, getUrl, list, remove } from '@aws-amplify/storage';
 import awsExports from './aws-exports';
 
 Amplify.configure(awsExports);
@@ -30,12 +30,18 @@ const StorageComponent = () => {
   // Download a file from S3
   const downloadFile = async (filePath) => {
     try {
-      const data = await downloadData({
+      const url = await getUrl({
         path: filePath,
       });
-      const url = URL.createObjectURL(data);
+      console.log('File URL:', url);
+
+      // Fetch the file from the URL
+      const response = await fetch(url);
+      const blob = await response.blob();
+
+      const downloadUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = url;
+      link.href = downloadUrl;
       link.download = filePath.replace('public/', '');
       document.body.appendChild(link);
       link.click();
@@ -44,6 +50,7 @@ const StorageComponent = () => {
       console.error('Error downloading file:', error);
     }
   };
+
 
   // List files in S3 bucket
   const fetchFileList = async () => {

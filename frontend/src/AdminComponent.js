@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { DataStore } from '@aws-amplify/datastore';  // Correct import
-import { Company } from './models'; // Ensure path is correct for your models
+import { DataStore } from '@aws-amplify/datastore';
+import { Company } from './models';
 import { TextField, Button, Box, Typography } from '@mui/material';
 
 const AdminComponent = () => {
@@ -46,7 +46,7 @@ const AdminComponent = () => {
       const original = await DataStore.query(Company, companyName);
       if (original) {
         await DataStore.save(
-          Company.copyOf(original, updated => {
+          Company.copyOf(original, (updated) => {
             updated.name = companyName;
             updated.location = companyLocation;
             updated.industry = companyIndustry;
@@ -61,11 +61,14 @@ const AdminComponent = () => {
     }
   };
 
-  const deleteCompany = async (companyName) => {
+  // Updated deleteCompany function to use the company ID
+  const deleteCompany = async (id) => {
     try {
-      const companyToDelete = await DataStore.query(Company, companyName);
-      await DataStore.delete(companyToDelete);
-      fetchCompanies();
+      const companyToDelete = await DataStore.query(Company, id);
+      if (companyToDelete) {
+        await DataStore.delete(companyToDelete);
+        fetchCompanies();
+      }
     } catch (error) {
       console.error('Error deleting company:', error);
     }
@@ -123,7 +126,10 @@ const AdminComponent = () => {
       <Box sx={{ mt: 4 }}>
         <Typography variant="h5">Existing Companies</Typography>
         {companies.map((company) => (
-          <Box key={company.id} sx={{ mt: 2, border: '1px solid #ccc', padding: '10px' }}>
+          <Box
+            key={company.id}
+            sx={{ mt: 2, border: '1px solid #ccc', padding: '10px' }}
+          >
             <Typography variant="h6">{company.name}</Typography>
             <Typography>Location: {company.location}</Typography>
             <Typography>Industry: {company.industry}</Typography>
@@ -137,7 +143,7 @@ const AdminComponent = () => {
               Update
             </Button>
             <Button
-              onClick={() => deleteCompany(company.name)}
+              onClick={() => deleteCompany(company.id)}
               variant="outlined"
               color="error"
               sx={{ mt: 2 }}
