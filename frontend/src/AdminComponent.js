@@ -4,7 +4,6 @@ import { Company } from './models'; // Ensure path is correct for your models
 import { TextField, Button, Box, Typography } from '@mui/material';
 
 const AdminComponent = () => {
-  const [companyID, setCompanyID] = useState(''); // Assuming `companyID` is replaced, or adjust if it's been renamed
   const [companyName, setCompanyName] = useState('');
   const [companyLocation, setCompanyLocation] = useState('');
   const [companyIndustry, setCompanyIndustry] = useState('');
@@ -73,7 +72,6 @@ const AdminComponent = () => {
   };
 
   const clearForm = () => {
-    setCompanyID('');
     setCompanyName('');
     setCompanyLocation('');
     setCompanyIndustry('');
@@ -131,7 +129,7 @@ const AdminComponent = () => {
             <Typography>Industry: {company.industry}</Typography>
             <Typography>Founded Year: {company.foundedYear}</Typography>
             <Button
-              onClick={() => updateCompany(company.id)}
+              onClick={() => updateCompany(company.name)}
               variant="contained"
               color="secondary"
               sx={{ mr: 2, mt: 2 }}
@@ -139,7 +137,7 @@ const AdminComponent = () => {
               Update
             </Button>
             <Button
-              onClick={() => deleteCompany(company.id)}
+              onClick={() => deleteCompany(company.name)}
               variant="outlined"
               color="error"
               sx={{ mt: 2 }}

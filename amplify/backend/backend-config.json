@@ -120,5 +120,12 @@
         }
       ]
     }
+  },
+  "storage": {
+    "s3welcomeaboardstoragedocument": {
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "S3"
+    }
   }
 }

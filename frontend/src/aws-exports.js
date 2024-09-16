@@ -34,7 +34,9 @@ const awsmobile = {
     },
     "aws_cognito_verification_mechanisms": [
         "EMAIL"
-    ]
+    ],
+    "aws_user_files_s3_bucket": "welcomeaboard-storage-document61275-dev",
+    "aws_user_files_s3_bucket_region": "eu-central-1"
 };
 
 

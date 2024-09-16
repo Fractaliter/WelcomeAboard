@@ -1,0 +1,12 @@
+{
+  "resourceName": "s3welcomeaboardstoragedocument",
+  "bucketName": "welcomeaboard-storage-document",
+  "policyUUID": "53d3eec9",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ]
+}

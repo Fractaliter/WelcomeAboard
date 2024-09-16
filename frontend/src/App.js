@@ -6,6 +6,7 @@ import { Container, Typography, Box, Card, CardContent } from '@mui/material';
 import awsconfig from './aws-exports';
 import AdminComponent from './AdminComponent';
 import UserComponent from './UserComponent';
+import StorageComponent from './StorageComponent';
 
 Amplify.configure(awsconfig);
 
@@ -74,6 +75,7 @@ function App() {
                       ) : (
                         <UserComponent />
                       )}
+                        <StorageComponent />
                       <Button
                         variant="contained"
                         color="primary"
