@@ -6,6 +6,7 @@
 
 import * as React from "react";
 import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { Company } from "../models";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -26,12 +27,14 @@ export declare type CompanyUpdateFormInputValues = {
     location?: string;
     industry?: string;
     FoundedYear?: string;
+    companyPassword?: string;
 };
 export declare type CompanyUpdateFormValidationValues = {
     name?: ValidationFunction<string>;
     location?: ValidationFunction<string>;
     industry?: ValidationFunction<string>;
     FoundedYear?: ValidationFunction<string>;
+    companyPassword?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type CompanyUpdateFormOverridesProps = {
@@ -40,12 +43,13 @@ export declare type CompanyUpdateFormOverridesProps = {
     location?: PrimitiveOverrideProps<TextFieldProps>;
     industry?: PrimitiveOverrideProps<TextFieldProps>;
     FoundedYear?: PrimitiveOverrideProps<TextFieldProps>;
+    companyPassword?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type CompanyUpdateFormProps = React.PropsWithChildren<{
     overrides?: CompanyUpdateFormOverridesProps | undefined | null;
 } & {
     id?: string;
-    company?: any;
+    company?: Company;
     onSubmit?: (fields: CompanyUpdateFormInputValues) => CompanyUpdateFormInputValues;
     onSuccess?: (fields: CompanyUpdateFormInputValues) => void;
     onError?: (fields: CompanyUpdateFormInputValues, errorMessage: string) => void;

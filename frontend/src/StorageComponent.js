@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
-import { uploadData, getUrl, list, remove } from '@aws-amplify/storage';
+import { uploadData, downloadData, list, remove } from '@aws-amplify/storage';  // Import specific functions
 import awsExports from './aws-exports';
 
 Amplify.configure(awsExports);
@@ -27,30 +27,26 @@ const StorageComponent = () => {
     }
   };
 
-  // Download a file from S3
-  const downloadFile = async (filePath) => {
+  const downloadFile = async (filename) => {
     try {
-      const url = await getUrl({
-        path: filePath,
-      });
-      console.log('File URL:', url);
-
-      // Fetch the file from the URL
-      const response = await fetch(url);
-      const blob = await response.blob();
-
-      const downloadUrl = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = filePath.replace('public/', '');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const fileKey = `${filename}`;  // Ensure correct path
+      const { body } = await downloadData({
+        path: fileKey,  // Correct path to file in S3
+      }).result;
+  
+      // Convert to Blob for download
+      const blob = await body.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     } catch (error) {
       console.error('Error downloading file:', error);
     }
   };
-
 
   // List files in S3 bucket
   const fetchFileList = async () => {

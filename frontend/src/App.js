@@ -73,7 +73,7 @@ function App() {
                       {userGroup === 'Admin' ? (
                         <AdminComponent />
                       ) : (
-                        <UserComponent />
+                        <UserComponent user={user} />
                       )}
                         <StorageComponent />
                       <Button

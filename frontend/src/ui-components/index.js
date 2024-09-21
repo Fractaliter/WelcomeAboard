@@ -6,4 +6,6 @@
 
 export { default as CompanyCreateForm } from "./CompanyCreateForm";
 export { default as CompanyUpdateForm } from "./CompanyUpdateForm";
+export { default as UserCompanyCreateForm } from "./UserCompanyCreateForm";
+export { default as UserCompanyUpdateForm } from "./UserCompanyUpdateForm";
 export { default as studioTheme } from "./studioTheme";

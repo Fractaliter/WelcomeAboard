@@ -7,11 +7,9 @@
 /* eslint-disable */
 import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import { Company } from "../models";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
-import { generateClient } from "aws-amplify/api";
-import { getCompany } from "../graphql/queries";
-import { updateCompany } from "../graphql/mutations";
-const client = generateClient();
+import { DataStore } from "aws-amplify/datastore";
 export default function CompanyUpdateForm(props) {
   const {
     id: idProp,
@@ -29,12 +27,16 @@ export default function CompanyUpdateForm(props) {
     location: "",
     industry: "",
     FoundedYear: "",
+    companyPassword: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [location, setLocation] = React.useState(initialValues.location);
   const [industry, setIndustry] = React.useState(initialValues.industry);
   const [FoundedYear, setFoundedYear] = React.useState(
     initialValues.FoundedYear
+  );
+  const [companyPassword, setCompanyPassword] = React.useState(
+    initialValues.companyPassword
   );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
@@ -45,18 +47,14 @@ export default function CompanyUpdateForm(props) {
     setLocation(cleanValues.location);
     setIndustry(cleanValues.industry);
     setFoundedYear(cleanValues.FoundedYear);
+    setCompanyPassword(cleanValues.companyPassword);
     setErrors({});
   };
   const [companyRecord, setCompanyRecord] = React.useState(companyModelProp);
   React.useEffect(() => {
     const queryData = async () => {
       const record = idProp
-        ? (
-            await client.graphql({
-              query: getCompany.replaceAll("__typename", ""),
-              variables: { id: idProp },
-            })
-          )?.data?.getCompany
+        ? await DataStore.query(Company, idProp)
         : companyModelProp;
       setCompanyRecord(record);
     };
@@ -68,6 +66,7 @@ export default function CompanyUpdateForm(props) {
     location: [],
     industry: [],
     FoundedYear: [],
+    companyPassword: [{ type: "Required" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -96,9 +95,10 @@ export default function CompanyUpdateForm(props) {
         event.preventDefault();
         let modelFields = {
           name,
-          location: location ?? null,
-          industry: industry ?? null,
-          FoundedYear: FoundedYear ?? null,
+          location,
+          industry,
+          FoundedYear,
+          companyPassword,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -128,22 +128,17 @@ export default function CompanyUpdateForm(props) {
               modelFields[key] = null;
             }
           });
-          await client.graphql({
-            query: updateCompany.replaceAll("__typename", ""),
-            variables: {
-              input: {
-                id: companyRecord.id,
-                ...modelFields,
-              },
-            },
-          });
+          await DataStore.save(
+            Company.copyOf(companyRecord, (updated) => {
+              Object.assign(updated, modelFields);
+            })
+          );
           if (onSuccess) {
             onSuccess(modelFields);
           }
         } catch (err) {
           if (onError) {
-            const messages = err.errors.map((e) => e.message).join("\n");
-            onError(modelFields, messages);
+            onError(modelFields, err.message);
           }
         }
       }}
@@ -163,6 +158,7 @@ export default function CompanyUpdateForm(props) {
               location,
               industry,
               FoundedYear,
+              companyPassword,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -190,6 +186,7 @@ export default function CompanyUpdateForm(props) {
               location: value,
               industry,
               FoundedYear,
+              companyPassword,
             };
             const result = onChange(modelFields);
             value = result?.location ?? value;
@@ -217,6 +214,7 @@ export default function CompanyUpdateForm(props) {
               location,
               industry: value,
               FoundedYear,
+              companyPassword,
             };
             const result = onChange(modelFields);
             value = result?.industry ?? value;
@@ -244,6 +242,7 @@ export default function CompanyUpdateForm(props) {
               location,
               industry,
               FoundedYear: value,
+              companyPassword,
             };
             const result = onChange(modelFields);
             value = result?.FoundedYear ?? value;
@@ -257,6 +256,34 @@ export default function CompanyUpdateForm(props) {
         errorMessage={errors.FoundedYear?.errorMessage}
         hasError={errors.FoundedYear?.hasError}
         {...getOverrideProps(overrides, "FoundedYear")}
+      ></TextField>
+      <TextField
+        label="Company password"
+        isRequired={true}
+        isReadOnly={false}
+        value={companyPassword}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              location,
+              industry,
+              FoundedYear,
+              companyPassword: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.companyPassword ?? value;
+          }
+          if (errors.companyPassword?.hasError) {
+            runValidationTasks("companyPassword", value);
+          }
+          setCompanyPassword(value);
+        }}
+        onBlur={() => runValidationTasks("companyPassword", companyPassword)}
+        errorMessage={errors.companyPassword?.errorMessage}
+        hasError={errors.companyPassword?.hasError}
+        {...getOverrideProps(overrides, "companyPassword")}
       ></TextField>
       <Flex
         justifyContent="space-between"

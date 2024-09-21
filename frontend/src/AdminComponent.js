@@ -9,6 +9,7 @@ const AdminComponent = () => {
   const [companyIndustry, setCompanyIndustry] = useState('');
   const [companyFoundedYear, setCompanyFoundedYear] = useState('');
   const [companies, setCompanies] = useState([]);
+  const [companysPassword, setCompanyPassword] = useState(''); // Add state for password
   const [editingCompanyId, setEditingCompanyId] = useState(null); // Track which company is being edited
 
   useEffect(() => {
@@ -38,6 +39,7 @@ const AdminComponent = () => {
             location: companyLocation,
             industry: companyIndustry,
             foundedYear: companyFoundedYear,
+            companyPassword: companysPassword // Save the company password
           })
         );
       }
@@ -58,6 +60,7 @@ const AdminComponent = () => {
             updated.location = companyLocation;
             updated.industry = companyIndustry;
             updated.foundedYear = companyFoundedYear;
+            updated.companyPassword = companysPassword;
           })
         );
         fetchCompanies();
@@ -85,6 +88,7 @@ const AdminComponent = () => {
     setCompanyLocation('');
     setCompanyIndustry('');
     setCompanyFoundedYear('');
+    setCompanyPassword('');
     setEditingCompanyId(null); // Reset the editing state
   };
 
@@ -93,6 +97,7 @@ const AdminComponent = () => {
     setCompanyLocation(company.location);
     setCompanyIndustry(company.industry);
     setCompanyFoundedYear(company.foundedYear);
+    setCompanyPassword(company.companyPassword);
     setEditingCompanyId(company.id); // Set the editing state
   };
 
@@ -133,6 +138,15 @@ const AdminComponent = () => {
           fullWidth
           sx={{ mb: 2 }}
         />
+        <TextField
+        label="Company Password"
+        type="password"
+        value={companysPassword}
+        onChange={(e) => setCompanyPassword(e.target.value)}
+        fullWidth
+        sx={{ mb: 2 }}
+        required
+       />
         <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
           {editingCompanyId ? 'Update Company' : 'Create Company'}
         </Button>
@@ -149,6 +163,7 @@ const AdminComponent = () => {
             <Typography>Location: {company.location}</Typography>
             <Typography>Industry: {company.industry}</Typography>
             <Typography>Founded Year: {company.foundedYear}</Typography>
+            <Typography>Password: XXX</Typography>
             <Button
               onClick={() => handleEdit(company)}
               variant="contained"

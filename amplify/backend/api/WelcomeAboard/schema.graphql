@@ -1,8 +1,15 @@
+type UserCompany @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  userId: String!
+  companyId: String!
+}
+
 type Company @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String!
   location: String
   industry: String
   FoundedYear: String
+  companyPassword: String!
 }
  

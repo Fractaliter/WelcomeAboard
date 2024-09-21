@@ -26,6 +26,9 @@
           "userPoolName": "WelcomeAboardPool",
           "webClientId": "5omurcqns8b7jfjm67fjuuis3q"
         }
+      },
+      "storage": {
+        "s3welcomeaboardstoragedocument": {}
       }
     }
   }

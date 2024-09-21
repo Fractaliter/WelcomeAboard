@@ -26,12 +26,14 @@ export declare type CompanyCreateFormInputValues = {
     location?: string;
     industry?: string;
     FoundedYear?: string;
+    companyPassword?: string;
 };
 export declare type CompanyCreateFormValidationValues = {
     name?: ValidationFunction<string>;
     location?: ValidationFunction<string>;
     industry?: ValidationFunction<string>;
     FoundedYear?: ValidationFunction<string>;
+    companyPassword?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type CompanyCreateFormOverridesProps = {
@@ -40,6 +42,7 @@ export declare type CompanyCreateFormOverridesProps = {
     location?: PrimitiveOverrideProps<TextFieldProps>;
     industry?: PrimitiveOverrideProps<TextFieldProps>;
     FoundedYear?: PrimitiveOverrideProps<TextFieldProps>;
+    companyPassword?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type CompanyCreateFormProps = React.PropsWithChildren<{
     overrides?: CompanyCreateFormOverridesProps | undefined | null;

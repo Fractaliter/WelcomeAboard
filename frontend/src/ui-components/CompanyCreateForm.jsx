@@ -7,10 +7,9 @@
 /* eslint-disable */
 import * as React from "react";
 import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import { Company } from "../models";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
-import { generateClient } from "aws-amplify/api";
-import { createCompany } from "../graphql/mutations";
-const client = generateClient();
+import { DataStore } from "aws-amplify/datastore";
 export default function CompanyCreateForm(props) {
   const {
     clearOnSuccess = true,
@@ -27,6 +26,7 @@ export default function CompanyCreateForm(props) {
     location: "",
     industry: "",
     FoundedYear: "",
+    companyPassword: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [location, setLocation] = React.useState(initialValues.location);
@@ -34,12 +34,16 @@ export default function CompanyCreateForm(props) {
   const [FoundedYear, setFoundedYear] = React.useState(
     initialValues.FoundedYear
   );
+  const [companyPassword, setCompanyPassword] = React.useState(
+    initialValues.companyPassword
+  );
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setName(initialValues.name);
     setLocation(initialValues.location);
     setIndustry(initialValues.industry);
     setFoundedYear(initialValues.FoundedYear);
+    setCompanyPassword(initialValues.companyPassword);
     setErrors({});
   };
   const validations = {
@@ -47,6 +51,7 @@ export default function CompanyCreateForm(props) {
     location: [],
     industry: [],
     FoundedYear: [],
+    companyPassword: [{ type: "Required" }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -78,6 +83,7 @@ export default function CompanyCreateForm(props) {
           location,
           industry,
           FoundedYear,
+          companyPassword,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -107,14 +113,7 @@ export default function CompanyCreateForm(props) {
               modelFields[key] = null;
             }
           });
-          await client.graphql({
-            query: createCompany.replaceAll("__typename", ""),
-            variables: {
-              input: {
-                ...modelFields,
-              },
-            },
-          });
+          await DataStore.save(new Company(modelFields));
           if (onSuccess) {
             onSuccess(modelFields);
           }
@@ -123,8 +122,7 @@ export default function CompanyCreateForm(props) {
           }
         } catch (err) {
           if (onError) {
-            const messages = err.errors.map((e) => e.message).join("\n");
-            onError(modelFields, messages);
+            onError(modelFields, err.message);
           }
         }
       }}
@@ -144,6 +142,7 @@ export default function CompanyCreateForm(props) {
               location,
               industry,
               FoundedYear,
+              companyPassword,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -171,6 +170,7 @@ export default function CompanyCreateForm(props) {
               location: value,
               industry,
               FoundedYear,
+              companyPassword,
             };
             const result = onChange(modelFields);
             value = result?.location ?? value;
@@ -198,6 +198,7 @@ export default function CompanyCreateForm(props) {
               location,
               industry: value,
               FoundedYear,
+              companyPassword,
             };
             const result = onChange(modelFields);
             value = result?.industry ?? value;
@@ -225,6 +226,7 @@ export default function CompanyCreateForm(props) {
               location,
               industry,
               FoundedYear: value,
+              companyPassword,
             };
             const result = onChange(modelFields);
             value = result?.FoundedYear ?? value;
@@ -238,6 +240,34 @@ export default function CompanyCreateForm(props) {
         errorMessage={errors.FoundedYear?.errorMessage}
         hasError={errors.FoundedYear?.hasError}
         {...getOverrideProps(overrides, "FoundedYear")}
+      ></TextField>
+      <TextField
+        label="Company password"
+        isRequired={true}
+        isReadOnly={false}
+        value={companyPassword}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              location,
+              industry,
+              FoundedYear,
+              companyPassword: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.companyPassword ?? value;
+          }
+          if (errors.companyPassword?.hasError) {
+            runValidationTasks("companyPassword", value);
+          }
+          setCompanyPassword(value);
+        }}
+        onBlur={() => runValidationTasks("companyPassword", companyPassword)}
+        errorMessage={errors.companyPassword?.errorMessage}
+        hasError={errors.companyPassword?.hasError}
+        {...getOverrideProps(overrides, "companyPassword")}
       ></TextField>
       <Flex
         justifyContent="space-between"
