@@ -71,7 +71,7 @@ function App() {
                       </Typography>
                       {/* Conditional rendering based on user role */}
                       {userGroup === 'Admin' ? (
-                        <AdminComponent />
+                        <AdminComponent user={user}/>
                       ) : (
                         <UserComponent user={user} />
                       )}

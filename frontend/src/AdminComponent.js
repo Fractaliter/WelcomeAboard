@@ -3,7 +3,7 @@ import { DataStore } from '@aws-amplify/datastore';
 import { Company } from './models';
 import { TextField, Button, Box, Typography } from '@mui/material';
 
-const AdminComponent = () => {
+const AdminComponent = ({ user }) => {
   const [companyName, setCompanyName] = useState('');
   const [companyLocation, setCompanyLocation] = useState('');
   const [companyIndustry, setCompanyIndustry] = useState('');
@@ -19,6 +19,7 @@ const AdminComponent = () => {
   const fetchCompanies = async () => {
     try {
       const companyData = await DataStore.query(Company);
+      console.log('Company result:', companyData);
       setCompanies(companyData);
     } catch (error) {
       console.error('Error fetching companies:', error);
