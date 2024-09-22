@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
+import { Hub } from '@aws-amplify/core';  // Correct import for Hub in Amplify v6+
 import { Authenticator, Button } from '@aws-amplify/ui-react';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { Container, Typography, Box, Card, CardContent } from '@mui/material';
@@ -7,6 +8,8 @@ import awsconfig from './aws-exports';
 import AdminComponent from './AdminComponent';
 import UserComponent from './UserComponent';
 import StorageComponent from './StorageComponent';
+import CompanyDocumentManager  from './CompanyDocumentManager';
+import CompanyAdminComponent  from './CompanyAdminComponent';
 
 Amplify.configure(awsconfig);
 
@@ -14,44 +17,64 @@ function App() {
   const [userGroup, setUserGroup] = useState(null);  // For user group (role)
 
   useEffect(() => {
-    checkUser();
-  }, []);
+    const checkUser = async () => {
+      try {
+        // Fetch the user session
+        const session = await fetchAuthSession(); 
 
-  const checkUser = async () => {
-    try {
-      // Fetch the user session
-      const session = await fetchAuthSession(); 
-  
-      // Log the full session
-      console.log('Full Auth Session:', session);
-  
-      // Check if the session has tokens and idToken
-      if (session && session.tokens && session.tokens.idToken) {
-        const idToken = session.tokens.idToken;
-        console.log('Full ID Token:', idToken);
-      
-        // Log payload
-        const payload = idToken.payload;
-        console.log('ID Token Payload:', payload);
-      
-        // Fetch user groups from the payload
-        const userGroups = payload["cognito:groups"];
-        console.log('User Groups:', userGroups);
-      
-        // Determine if user is an Admin or not
-        if (userGroups && userGroups.includes('Admin')) {
-          setUserGroup('Admin');
+        // Log the full session
+        console.log('Full Auth Session:', session);
+
+        // Check if the session has tokens and idToken
+        if (session && session.tokens && session.tokens.idToken) {
+          const idToken = session.tokens.idToken;
+          console.log('Full ID Token:', idToken);
+        
+          // Log payload
+          const payload = idToken.payload;
+          console.log('ID Token Payload:', payload);
+        
+          // Fetch user groups from the payload
+          const userGroups = payload["cognito:groups"] || [];
+          console.log('User Groups:', userGroups);
+
+          // Determine user group (prioritizing higher privileges)
+          if (userGroups.includes('CompanyAdmin')) {
+            setUserGroup('CompanyAdmin');
+          };
+          if (userGroups.includes('Admin')) {
+            setUserGroup('Admin');
+          } else {
+            setUserGroup('User');
+          }
         } else {
-          setUserGroup('User');
+          console.log('User is not signed in or session is missing.');
         }
-      } else {
-        console.log('User is not signed in or session is missing.');
+      } catch (error) {
+        console.log('Error retrieving user session:', error);
       }
-    } catch (error) {
-      console.log('Error retrieving user session:', error);
-    }
-  };
-  
+    };
+
+    // Call checkUser to verify the session when the component mounts
+    checkUser();
+
+    // Listen for Auth events using Amplify's Hub
+    const listener = (data) => {
+      const { event } = data.payload;
+      if (event === 'signIn' || event === 'signOut') {
+        // Recheck user session on sign in or sign out
+        checkUser();
+      }
+    };
+
+    // Register the Hub listener for auth events
+    const removeListener = Hub.listen('auth', listener);
+
+    // Clean up listener when the component unmounts
+    return () => {
+      removeListener();  // Properly clean up the listener using the return value
+    };
+  }, []);
 
   return (
     <Container maxWidth="sm">
@@ -75,6 +98,15 @@ function App() {
                       ) : (
                         <UserComponent user={user} />
                       )}
+
+                       {userGroup === 'CompanyAdmin' && 
+                       <CompanyAdminComponent />
+                       }
+                       
+                       {userGroup === 'CompanyAdmin' && 
+                       <CompanyDocumentManager />
+                       }
+
                         <StorageComponent />
                       <Button
                         variant="contained"

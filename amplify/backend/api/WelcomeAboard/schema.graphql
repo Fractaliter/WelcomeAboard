@@ -1,3 +1,10 @@
+type CompanyDocument @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  fileName: String!
+  fileUrl: String!
+  companyId: ID!
+}
+
 type UserCompany @model @auth(rules: [{allow: public}]) {
   id: ID!
   userId: String!

@@ -5,6 +5,8 @@
  **************************************************************************/
 
 export { default as CompanyCreateForm } from "./CompanyCreateForm";
+export { default as CompanyDocumentCreateForm } from "./CompanyDocumentCreateForm";
+export { default as CompanyDocumentUpdateForm } from "./CompanyDocumentUpdateForm";
 export { default as CompanyUpdateForm } from "./CompanyUpdateForm";
 export { default as UserCompanyCreateForm } from "./UserCompanyCreateForm";
 export { default as UserCompanyUpdateForm } from "./UserCompanyUpdateForm";

@@ -6,6 +6,38 @@ import { LazyLoading, LazyLoadingDisabled } from "@aws-amplify/datastore";
 
 
 
+type EagerCompanyDocument = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<CompanyDocument, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly fileName: string;
+  readonly fileUrl: string;
+  readonly companyId: string;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyCompanyDocument = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<CompanyDocument, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly fileName: string;
+  readonly fileUrl: string;
+  readonly companyId: string;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type CompanyDocument = LazyLoading extends LazyLoadingDisabled ? EagerCompanyDocument : LazyCompanyDocument
+
+export declare const CompanyDocument: (new (init: ModelInit<CompanyDocument>) => CompanyDocument) & {
+  copyOf(source: CompanyDocument, mutator: (draft: MutableModel<CompanyDocument>) => MutableModel<CompanyDocument> | void): CompanyDocument;
+}
+
 type EagerUserCompany = {
   readonly [__modelMeta__]: {
     identifier: ManagedIdentifier<UserCompany, 'id'>;

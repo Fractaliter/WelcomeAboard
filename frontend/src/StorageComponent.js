@@ -85,7 +85,7 @@ const StorageComponent = () => {
       <input type="file" onChange={(e) => setFile(e.target.files[0])} />
       <button onClick={uploadFile}>Upload</button>
 
-      <h3>Files in Storage</h3>
+      <h3>Public Files in Storage</h3>
       {Array.isArray(fileList) && fileList.length > 0 ? (
         <ul>
           {fileList.map((file) => (
