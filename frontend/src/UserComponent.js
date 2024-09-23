@@ -90,7 +90,7 @@ const UserComponent = ({ user }) => {
 
     return (
       <Typography variant="h5" gutterBottom>
-        User Dashboard: Welcome, regular user.
+        Regular user Dashboard: 
         <form onSubmit={handleJoinCompany}>
           <select onChange={(e) => setSelectedCompany(e.target.value)}>
             {companies.map((company) => (

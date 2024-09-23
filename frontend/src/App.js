@@ -14,7 +14,8 @@ import CompanyAdminComponent  from './CompanyAdminComponent';
 Amplify.configure(awsconfig);
 
 function App() {
-  const [userGroup, setUserGroup] = useState(null);  // For user group (role)
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isCompanyAdmin, setIsCompanyAdmin] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -38,15 +39,12 @@ function App() {
           const userGroups = payload["cognito:groups"] || [];
           console.log('User Groups:', userGroups);
 
-          // Determine user group (prioritizing higher privileges)
-          if (userGroups.includes('CompanyAdmin')) {
-            setUserGroup('CompanyAdmin');
-          };
-          if (userGroups.includes('Admin')) {
-            setUserGroup('Admin');
-          } else {
-            setUserGroup('User');
-          }
+      
+          // Check if the user belongs to Admin group
+          setIsAdmin(userGroups.includes('Admin'));
+
+          // Check if the user belongs to CompanyAdmin group
+          setIsCompanyAdmin(userGroups.includes('CompanyAdmin'));
         } else {
           console.log('User is not signed in or session is missing.');
         }
@@ -92,21 +90,18 @@ function App() {
                       <Typography variant="h6" gutterBottom>
                         Hello, {user.username}
                       </Typography>
-                      {/* Conditional rendering based on user role */}
-                      {userGroup === 'Admin' ? (
-                        <AdminComponent user={user}/>
-                      ) : (
-                        <UserComponent user={user} />
-                      )}
+                        {/* Render AdminComponent if user is an Admin or CompanyAdmin */}
+                        {isAdmin && <AdminComponent user={user} />}
 
-                       {userGroup === 'CompanyAdmin' && 
-                       <CompanyAdminComponent />
-                       }
-                       
-                       {userGroup === 'CompanyAdmin' && 
-                       <CompanyDocumentManager />
-                       }
+                        {/* Render CompanyAdminComponent and CompanyDocumentManager only if user is a CompanyAdmin */}
+                        {isCompanyAdmin && (
+                          <>
+                            <CompanyAdminComponent />
+                            <CompanyDocumentManager />
+                          </>
+                        )}
 
+                        <UserComponent />
                         <StorageComponent />
                       <Button
                         variant="contained"
