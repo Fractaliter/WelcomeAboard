@@ -1,55 +1,39 @@
 import React, { useState } from 'react';
-import { uploadData } from '@aws-amplify/storage';  // Import the uploadData function
-import { DataStore } from '@aws-amplify/datastore';  // Correct import for DataStore
-import { CompanyDocument } from './models';  // Ensure the path is correct
+import { DataStore } from '@aws-amplify/datastore';
+import { CompanyDocument } from './models'; // Assuming this is the model for documents
 
 const CompanyAdminComponent = ({ companyId }) => {
   const [file, setFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
-
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
 
   const uploadDocument = async () => {
-    if (!file) return;
-
-    setUploading(true);
-
     try {
-      // Upload file to S3 using the specific uploadData function
-      const result = await uploadData({
-        key: `company-${companyId}/${file.name}`,
-        data: file,
-        contentType: file.type,
-      });
+      if (!file) {
+        console.error('No file selected');
+        return;
+      }
 
-      console.log('File uploaded successfully:', result);
+      // Generate a file URL for this example (you would normally upload to S3)
+      const fileUrl = URL.createObjectURL(file);
 
-      // Create a new CompanyDocument entry
+      // Save the document in DataStore, linked to the selected company
       await DataStore.save(
         new CompanyDocument({
+          companyId,      // Pass the companyId to link the document
+          fileUrl,        // Include the file URL
           fileName: file.name,
-          fileUrl: result.key,
-          companyId: companyId,  // Link document to the company
         })
       );
-
-      console.log('Document linked to company successfully');
+      console.log('Document uploaded successfully');
     } catch (error) {
       console.error('Error uploading document:', error);
-    } finally {
-      setUploading(false);
     }
   };
 
   return (
     <div>
       <h2>Upload Document for Company</h2>
-      <input type="file" onChange={handleFileChange} />
-      <button onClick={uploadDocument} disabled={uploading}>
-        {uploading ? 'Uploading...' : 'Upload'}
-      </button>
+      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+      <button onClick={uploadDocument}>Upload Document</button>
     </div>
   );
 };

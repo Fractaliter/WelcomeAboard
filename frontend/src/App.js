@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
 import { Hub } from '@aws-amplify/core';  // Correct import for Hub in Amplify v6+
 import { Authenticator, Button } from '@aws-amplify/ui-react';
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { fetchAuthSession, signOut  } from 'aws-amplify/auth';
 import { Container, Typography, Box, Card, CardContent } from '@mui/material';
+import { DataStore } from '@aws-amplify/datastore';
+import { Company } from './models';
 import awsconfig from './aws-exports';
 import AdminComponent from './AdminComponent';
 import UserComponent from './UserComponent';
@@ -16,6 +18,8 @@ Amplify.configure(awsconfig);
 function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCompanyAdmin, setIsCompanyAdmin] = useState(false);
+  const [companies, setCompanies] = useState([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState('');
 
   useEffect(() => {
     const checkUser = async () => {
@@ -45,6 +49,16 @@ function App() {
 
           // Check if the user belongs to CompanyAdmin group
           setIsCompanyAdmin(userGroups.includes('CompanyAdmin'));
+
+          if (userGroups.includes('CompanyAdmin')) {
+            // Fetch companies the user is an admin for
+            const companyData = await DataStore.query(Company);
+            setCompanies(companyData);
+            // Automatically select the first company if there's only one
+            if (companyData.length === 1) {
+              setSelectedCompanyId(companyData[0].id);
+            }
+          }
         } else {
           console.log('User is not signed in or session is missing.');
         }
@@ -88,20 +102,40 @@ function App() {
                   {user ? (
                     <Box textAlign="center">
                       <Typography variant="h6" gutterBottom>
-                        Hello, {user.username}
+                        Hello, {user.userId}
                       </Typography>
                         {/* Render AdminComponent if user is an Admin or CompanyAdmin */}
                         {isAdmin && <AdminComponent user={user} />}
 
                         {/* Render CompanyAdminComponent and CompanyDocumentManager only if user is a CompanyAdmin */}
                         {isCompanyAdmin && (
-                          <>
-                            <CompanyAdminComponent />
-                            <CompanyDocumentManager />
+                            <>
+                            <h2> View Company Documents</h2>
+                            {/* Dropdown to select the company if admin for multiple companies */}
+                            <select
+                              value={selectedCompanyId}
+                              onChange={(e) => setSelectedCompanyId(e.target.value)}
+                            >
+                              <option value="">-- Select a Company --</option>
+                              {companies.map((company) => (
+                                <option key={company.id} value={company.id}>
+                                  {company.name}
+                                </option>
+                              ))}
+                            </select>
+                  
+                            {/* Render CompanyAdminComponent and pass selected company ID */}
+                            {selectedCompanyId && (
+                              <>
+                                <CompanyAdminComponent companyId={selectedCompanyId} />
+                                <CompanyDocumentManager companyId={selectedCompanyId} />
+                              </>
+                            )}
                           </>
                         )}
 
-                        <UserComponent />
+                        
+                        <UserComponent user={user} />
                         <StorageComponent />
                       <Button
                         variant="contained"

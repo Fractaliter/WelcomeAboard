@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { list, remove, downloadData } from '@aws-amplify/storage';  // Import specific functions
+import { remove, downloadData } from '@aws-amplify/storage';  // Import specific functions
 import { DataStore } from '@aws-amplify/datastore';
 import { CompanyDocument } from './models';
 
@@ -43,7 +43,7 @@ const CompanyDocumentManager = ({ companyId }) => {
 
   return (
     <div>
-      <h2>Manage Documents for Company</h2>
+      <h4>Company Documents:</h4>
       <ul>
         {documents.map((doc) => (
           <li key={doc.id}>
