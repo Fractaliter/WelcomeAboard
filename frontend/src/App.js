@@ -13,6 +13,8 @@ import CompanyDocumentManager  from './components/CompanyDocumentManager';
 import CompanyAdminComponent  from './components/CompanyAdminComponent';
 import CustomerDashboard  from './components/CustomerDashboard';
 
+import '@aws-amplify/ui-react/styles.css';
+
 Amplify.configure(awsconfig);
 
 function App() { 
