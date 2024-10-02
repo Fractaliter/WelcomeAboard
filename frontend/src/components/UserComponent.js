@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography } from '@mui/material';
-import { Company, UserCompany } from './models';
+import { Company, UserCompany } from '../models';
 import { DataStore } from '@aws-amplify/datastore';
 import CompanyDocumentManager  from './CompanyDocumentManager';
 
@@ -112,9 +112,10 @@ const UserComponent = ({ user }) => {
         <Button type="submit">Join Company</Button>
       </form>
       <p>Companies You've Joined:</p>
-      {joinedCompanies.length > 0 ? (
-        <ul>
-          {joinedCompanies.map((company) => (
+      {joinedCompanies && joinedCompanies.length > 0 ? (
+      <ul>
+        {joinedCompanies.map((company) => (
+          company && company.id && company.name && company.location ? ( // Add null checks for company and its properties
             <li key={company.id}>
               <strong>{company.name}</strong> - {company.location}
               <button
@@ -123,13 +124,16 @@ const UserComponent = ({ user }) => {
               >
                 Remove
               </button>
-             <CompanyDocumentManager companyId={company.id} />
+              <CompanyDocumentManager companyId={company.id} />
             </li>
-          ))}
-        </ul>
-      ) : (
-        <p>You have not joined any companies yet.</p>
-      )}
+          ) : (
+            <li key={Math.random()}>Invalid company data</li> // Fallback for invalid company data
+          )
+        ))}
+      </ul>
+    ) : (
+      <p>You have not joined any companies yet.</p>
+    )}
     </Typography>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { remove, downloadData } from '@aws-amplify/storage';  // Import specific functions
 import { DataStore } from '@aws-amplify/datastore';
-import { CompanyDocument } from './models';
+import { CompanyDocument } from '../models';
 
 const CompanyDocumentManager = ({ companyId }) => {
   const [documents, setDocuments] = useState([]);

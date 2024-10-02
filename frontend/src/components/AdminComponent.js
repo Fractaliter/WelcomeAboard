@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DataStore } from '@aws-amplify/datastore';
-import { Company } from './models';
+import { Company } from '../models';
 import { TextField, Button, Box, Typography } from '@mui/material';
 
 const AdminComponent = ({ user }) => {

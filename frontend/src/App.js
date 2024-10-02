@@ -2,20 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
 import { Hub } from '@aws-amplify/core';  // Correct import for Hub in Amplify v6+
 import { Authenticator, Button } from '@aws-amplify/ui-react';
-import { fetchAuthSession, signOut  } from 'aws-amplify/auth';
+import { fetchAuthSession  } from 'aws-amplify/auth';
 import { Container, Typography, Box, Card, CardContent } from '@mui/material';
 import { DataStore } from '@aws-amplify/datastore';
 import { Company } from './models';
 import awsconfig from './aws-exports';
-import AdminComponent from './AdminComponent';
-import UserComponent from './UserComponent';
-import StorageComponent from './StorageComponent';
-import CompanyDocumentManager  from './CompanyDocumentManager';
-import CompanyAdminComponent  from './CompanyAdminComponent';
+import AdminComponent from './components/AdminComponent';
+import UserComponent from './components/UserComponent';
+import StorageComponent from './components/StorageComponent';
+import CompanyDocumentManager  from './components/CompanyDocumentManager';
+import CompanyAdminComponent  from './components/CompanyAdminComponent';
+import CustomerDashboard  from './components/CustomerDashboard';
 
 Amplify.configure(awsconfig);
 
-function App() {
+function App() { 
+  const [userEmail, setUserEmail] = useState('');
+  const [activePortal, setActivePortal] = useState('customer');  // Default to Customer Dashboard
   const [isAdmin, setIsAdmin] = useState(false);
   const [isCompanyAdmin, setIsCompanyAdmin] = useState(false);
   const [companies, setCompanies] = useState([]);
@@ -39,6 +42,9 @@ function App() {
           const payload = idToken.payload;
           console.log('ID Token Payload:', payload);
         
+          // Extract email and user groups
+          setUserEmail(payload.email);
+
           // Fetch user groups from the payload
           const userGroups = payload["cognito:groups"] || [];
           console.log('User Groups:', userGroups);
@@ -82,12 +88,52 @@ function App() {
     // Register the Hub listener for auth events
     const removeListener = Hub.listen('auth', listener);
 
+   
+
+    
     // Clean up listener when the component unmounts
     return () => {
       removeListener();  // Properly clean up the listener using the return value
     };
   }, []);
-
+  
+  const renderPortalContent = (user, isAdmin, isCompanyAdmin) => {
+    if (activePortal === 'customer') {
+      return <CustomerDashboard />;
+    } else if (activePortal === 'company') {
+      return (
+        <>
+          <UserComponent user={user} />
+          <hr />
+          <h2> View Company Documents</h2>
+          <select
+            value={selectedCompanyId}
+            onChange={(e) => setSelectedCompanyId(e.target.value)}
+          >
+            <option value="">-- Select a Company --</option>
+            {companies.map((company) => (
+              <option key={company.id} value={company.id}>
+                {company.name}
+              </option>
+            ))}
+          </select>
+          {selectedCompanyId && (
+            <>
+              <hr />
+              <CompanyAdminComponent companyId={selectedCompanyId} />
+              <CompanyDocumentManager companyId={selectedCompanyId} />
+              <hr />
+            </>
+          )}
+          <StorageComponent />
+          <hr />
+        </>
+      )
+    }else if (activePortal === 'admin') {
+      return (
+        <AdminComponent user={user} />
+      );}
+  };
   return (
     <Container maxWidth="sm">
       <Box sx={{ mt: 8, display: 'flex', justifyContent: 'center' }}>
@@ -96,47 +142,43 @@ function App() {
             <Typography variant="h4" align="center" gutterBottom>
               Welcome to WelcomeAboard
             </Typography>
+
             <Authenticator>
               {({ signOut, user }) => (
                 <Box>
                   {user ? (
                     <Box textAlign="center">
                       <Typography variant="h6" gutterBottom>
-                        Hello, {user.userId}
+                       Hello, {userEmail || 'User'}
                       </Typography>
-                        {/* Render AdminComponent if user is an Admin or CompanyAdmin */}
-                        {isAdmin && <AdminComponent user={user} />}
 
-                        {/* Render CompanyAdminComponent and CompanyDocumentManager only if user is a CompanyAdmin */}
-                        {isCompanyAdmin && (
-                            <>
-                            <h2> View Company Documents</h2>
-                            {/* Dropdown to select the company if admin for multiple companies */}
-                            <select
-                              value={selectedCompanyId}
-                              onChange={(e) => setSelectedCompanyId(e.target.value)}
-                            >
-                              <option value="">-- Select a Company --</option>
-                              {companies.map((company) => (
-                                <option key={company.id} value={company.id}>
-                                  {company.name}
-                                </option>
-                              ))}
-                            </select>
-                  
-                            {/* Render CompanyAdminComponent and pass selected company ID */}
-                            {selectedCompanyId && (
-                              <>
-                                <CompanyAdminComponent companyId={selectedCompanyId} />
-                                <CompanyDocumentManager companyId={selectedCompanyId} />
-                              </>
-                            )}
-                          </>
-                        )}
+                      {/* Menu for Portal Selection */}
+                      <Box sx={{ my: 2 }}>
+                        <Button
+                          variant={activePortal === 'customer' ? 'contained' : 'outlined'}
+                          onClick={() => setActivePortal('customer')}
+                          sx={{ mr: 2 }}
+                        >
+                          Customer Dashboard
+                        </Button>
+                        <Button
+                          variant={activePortal === 'company' ? 'contained' : 'outlined'}
+                          onClick={() => setActivePortal('company')}
+                        >
+                          Company Document Manager
+                        </Button>
+                        {isAdmin &&<Button
+                          variant={activePortal === 'admin' ? 'contained' : 'outlined'}
+                          onClick={() => setActivePortal('admin')}
+                        >
+                          Admin
+                        </Button>}
+                      </Box>
 
-                        
-                        <UserComponent user={user} />
-                        <StorageComponent />
+                      {/* Render content based on the active portal */}
+                      {renderPortalContent(user, isAdmin, isCompanyAdmin)}
+
+
                       <Button
                         variant="contained"
                         color="primary"

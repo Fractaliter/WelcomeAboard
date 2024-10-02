@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
 import { uploadData, downloadData, list, remove } from '@aws-amplify/storage';  // Import specific functions
-import awsExports from './aws-exports';
+import awsExports from '../aws-exports';
 
 Amplify.configure(awsExports);
 
@@ -81,6 +81,7 @@ const StorageComponent = () => {
 
   return (
     <div>
+      <h3>Public document Storage</h3>
       <h3>Upload a file</h3>
       <input type="file" onChange={(e) => setFile(e.target.files[0])} />
       <button onClick={uploadFile}>Upload</button>
