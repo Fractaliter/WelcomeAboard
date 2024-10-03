@@ -1,10 +1,46 @@
 import { ModelInit, MutableModel, __modelMeta__, ManagedIdentifier } from "@aws-amplify/datastore";
 // @ts-ignore
-import { LazyLoading, LazyLoadingDisabled } from "@aws-amplify/datastore";
+import { LazyLoading, LazyLoadingDisabled, AsyncItem } from "@aws-amplify/datastore";
 
 
 
 
+
+type EagerTicket = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Ticket, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly status: string;
+  readonly description: string;
+  readonly Company: Company;
+  readonly supportAgentId?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly ticketCompanyId: string;
+}
+
+type LazyTicket = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Ticket, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly status: string;
+  readonly description: string;
+  readonly Company: AsyncItem<Company>;
+  readonly supportAgentId?: string | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly ticketCompanyId: string;
+}
+
+export declare type Ticket = LazyLoading extends LazyLoadingDisabled ? EagerTicket : LazyTicket
+
+export declare const Ticket: (new (init: ModelInit<Ticket>) => Ticket) & {
+  copyOf(source: Ticket, mutator: (draft: MutableModel<Ticket>) => MutableModel<Ticket> | void): Ticket;
+}
 
 type EagerCompanyDocument = {
   readonly [__modelMeta__]: {

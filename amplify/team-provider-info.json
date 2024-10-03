@@ -29,6 +29,15 @@
       },
       "storage": {
         "s3welcomeaboardstoragedocument": {}
+      },
+      "function": {
+        "createTicket": {
+          "deploymentBucketName": "amplify-welcomeaboard-dev-61275-deployment",
+          "s3Key": "amplify-builds/createTicket-774e557656413052692f-build.zip"
+        }
+      },
+      "api": {
+        "WelcomeAboard": {}
       }
     }
   }

@@ -31,6 +31,13 @@
       "serviceType": "imported"
     }
   },
+  "function": {
+    "createTicket": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
   "parameters": {
     "AMPLIFY_auth_welcomeaboard_allowUnauthenticatedIdentities": {
       "usedBy": [
@@ -117,6 +124,22 @@
         {
           "category": "auth",
           "resourceName": "welcomeaboard"
+        }
+      ]
+    },
+    "AMPLIFY_function_createTicket_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "createTicket"
+        }
+      ]
+    },
+    "AMPLIFY_function_createTicket_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "createTicket"
         }
       ]
     }

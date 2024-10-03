@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
 import { Authenticator, Button } from '@aws-amplify/ui-react';
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { fetchAuthSession,getCurrentUser } from 'aws-amplify/auth';
 import { Container, Typography, Box, Card, CardContent } from '@mui/material';
 import { DataStore } from '@aws-amplify/datastore';
 import { Company } from './models';
@@ -23,12 +23,14 @@ function App() {
   const [isCompanyAdmin, setIsCompanyAdmin] = useState(false);
   const [companies, setCompanies] = useState([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState('');
+  const [authUser, setAuthUser] = useState(null); // Track the signed-in user
 
   const checkUser = async () => {
     try {
       // Fetch the user session
       const session = await fetchAuthSession(); 
-
+      setAuthUser(await getCurrentUser()); // Set the user in state
+      console.log('Current User', authUser);
       // Log the full session
       console.log('Full Auth Session:', session);
 
@@ -118,7 +120,7 @@ function App() {
 
             <Authenticator>
               {({ signOut, user }) => {
-                if (user) {
+                if (user && !authUser) {
                   // Call checkUser after sign-in
                   checkUser();
                 }
@@ -160,13 +162,16 @@ function App() {
                         {renderPortalContent(user, isAdmin, isCompanyAdmin)}
 
                         <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={signOut}
-                          sx={{ mt: 2 }}
-                        >
-                          Sign Out
-                        </Button>
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                          signOut();
+                          checkUser();
+                        }}
+                        sx={{ mt: 2 }}
+                      >
+                        Sign Out
+                      </Button>
                       </Box>
                     ) : (
                       <Typography>Please sign in</Typography>
